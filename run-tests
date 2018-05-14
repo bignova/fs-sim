@@ -1,0 +1,30 @@
+#!/bin/tcsh
+
+make -f Makefile all
+
+if ($status) then
+  echo "'make all' target failed- your program probably doesn't compile."
+  exit -1
+else
+
+  foreach test_file (public*.x)
+
+    set test = $test_file:r
+
+    if (-e $test.input) then
+      $test.x < $test.input |& cmp -s - $test.output
+      set exit_status = $status
+    else
+      $test.x |& cmp -s - $test.output
+      set exit_status = $status
+    endif
+
+    if ($exit_status == 0) then
+      echo "Test $test passed\!"
+    else
+      echo "Test $test FAILED.  :-("
+    endif
+
+  end
+
+endif
